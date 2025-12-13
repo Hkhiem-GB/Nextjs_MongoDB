@@ -37,7 +37,7 @@ export default function UsersPage() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', image: '' });
+    const [formData, setFormData] = useState({ name: '', email: '', password: '', image: '', role: 'user' });
     const [showPassword, setShowPassword] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,7 +59,7 @@ export default function UsersPage() {
     // 2. Xử lý Mở Modal Thêm mới
     const handleOpenAdd = () => {
         setIsEditMode(false);
-        setFormData({ name: '', email: '', password: '', image: '' });
+        setFormData({ name: '', email: '', password: '', image: '', role: 'user' });
         setShowModal(true);
     };
 
@@ -68,7 +68,7 @@ export default function UsersPage() {
         setIsEditMode(true);
         setCurrentUser(user);
         // Password để trống, chỉ nhập khi muốn đổi
-        setFormData({ name: user.name, email: user.email, password: '', image: user.image || '' });
+        setFormData({ name: user.name, email: user.email, password: '', image: user.image || '', role: user.role || 'user' }); // Lấy role từ user, nếu không có thì mặc định là user
         setShowModal(true);
     };
 
@@ -288,6 +288,28 @@ export default function UsersPage() {
                                        className={`w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-400
                     ${isEditMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed select-none' : 'bg-white text-gray-800'}`}
                                        placeholder="email@example.com" />
+                            </div>
+
+                            {/* --- THÊM PHẦN CHỌN ROLE (QUYỀN HẠN) --- */}
+                            <div className="space-y-1">
+                                <label className="block text-sm font-semibold text-gray-700">Phân quyền thành viên</label>
+                                <div className="relative">
+                                    <select
+                                        value={formData.role}
+                                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-800 appearance-none bg-white cursor-pointer"
+                                    >
+                                        <option value="user">Thành viên (User)</option>
+                                        <option value="admin">Quản trị viên (Admin)</option>
+                                    </select>
+                                    {/* Mũi tên trỏ xuống trang trí cho đẹp */}
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    * Admin: Có toàn quyền quản lý hệ thống. User: Chỉ xem được nội dung.
+                                </p>
                             </div>
 
                             {/* Mật khẩu (Có nút ẩn hiện) */}

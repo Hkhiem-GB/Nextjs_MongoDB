@@ -1,10 +1,32 @@
 // src/app/dashboard/page.tsx
 import { FaUserFriends, FaBookOpen, FaShieldAlt, FaChartLine } from 'react-icons/fa';
+import {useSession} from "next-auth/react";
+import User from "../../../models/User";
+import dbConnect from "../../../libs/mongodb";
+import {authOptions} from "@/app/api/auth/[...nextauth]/route";
+import {getServerSession} from "next-auth";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+
+    // 1. Lấy thông tin người dùng hiện tại
+    const session = await getServerSession(authOptions);
+
+    // 2. Kết nối DB để lấy tên mới nhất (tránh trường hợp sửa tên xong chưa cập nhật)
+    await dbConnect();
+    const currentUser = await User.findOne({ email: session?.user?.email }).select('name').lean();
+
+    // 3. Lấy tên ra (Ưu tiên tên trong DB -> Tên trong Session -> Mặc định)
+    const userName = currentUser?.name || session?.user?.name || "User";
+
     return (
-        <div>
-            <h1 className="text-black text-4xl font-bold mb-6">Welcome to your admin dashboard</h1>
+        <div className="p-4">
+            <h1 className="text-black text-4xl font-bold mb-6">
+                Welcome back, <span className="text-blue-600">{userName}</span>!
+            </h1>
+
+            <p className="text-gray-600 mb-8">
+                Here is what&apos;s happening with your projects today.
+            </p>
 
             {/* Grid thống kê */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

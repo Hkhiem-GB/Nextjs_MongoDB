@@ -10,9 +10,13 @@ export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true); // Toggle giữa Login và Register
     const [data, setData] = useState({ name: '', email: '', password: '' });
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // 1. BẮT ĐẦU: Bật loading lên ngay lập tức
+        setLoading(true);
 
         if (isLogin) {
             // --- XỬ LÝ ĐĂNG NHẬP ---
@@ -22,14 +26,20 @@ export default function LoginPage() {
                 password: data.password
             });
 
-            if (res?.error) toast.error(res.error);
+            if (res?.error) {
+                toast.error(res.error);
+                setLoading(false); // ❌ Thất bại: Tắt loading để người dùng nhập lại
+            }
             else {
                 toast.success('Đăng nhập thành công!');
-                router.push('/dashboard'); // Chuyển hướng vào Dashboard
+                router.push('/dashboard');
+                // ✅ Thành công: KHÔNG tắt loading.
+                // Để nó quay tiếp cho đến khi trang Dashboard hiện ra -> Tạo cảm giác mượt mà.
             }
         } else {
             // --- XỬ LÝ ĐĂNG KÝ ---
             try {
+                // Lưu ý: Đảm bảo đường dẫn này đúng với file route bạn tạo
                 const res = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -40,11 +50,14 @@ export default function LoginPage() {
                 if (res.ok) {
                     toast.success('Đăng ký thành công! Hãy đăng nhập.');
                     setIsLogin(true); // Chuyển về form đăng nhập
+                    setLoading(false); // ✅ Đăng ký xong: Tắt loading để người dùng thao tác tiếp
                 } else {
                     toast.error(result.message);
+                    setLoading(false); // ❌ Lỗi từ server (ví dụ trùng email): Tắt loading
                 }
             } catch (err) {
                 toast.error('Có lỗi xảy ra.');
+                setLoading(false); // ❌ Lỗi mạng/code: Tắt loading
             }
         }
     };
@@ -122,6 +135,30 @@ export default function LoginPage() {
                     </button>
                 </p>
             </div>
+
+            {/* --- HIỆU ỨNG THANH TRƯỢT ĐỎ --- */}
+            {loading && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md transition-all duration-300">
+
+                    {/* Hộp chứa thanh trượt */}
+                    <div className="w-64 h-3 bg-gray-800/50 rounded-full relative overflow-hidden p-0.5 backdrop-blur-sm border border-white/10 shadow-xl">
+
+                        {/* Thanh đỏ trượt bên trong */}
+                        <div className="absolute top-0 left-0 h-full w-1/3 rounded-full bg-gradient-to-r from-red-600 via-red-500 to-red-600 animate-progress-slide shadow-[0_0_20px_rgba(220,38,38,0.8)]">
+                            {/* Hiệu ứng phát sáng ở đầu thanh */}
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-red-400 rounded-full blur-[6px]"></div>
+                        </div>
+
+                    </div>
+
+                    {/* Dòng chữ Loading bên dưới */}
+                    <div className="mt-6 text-red-500 font-bold tracking-[0.2em] text-sm animate-pulse uppercase">
+                        Đang xử lý...
+                    </div>
+
+                </div>
+            )}
+
         </div>
     );
 }

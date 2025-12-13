@@ -4,21 +4,21 @@ import User from "../../../../models/User";
 import bcrypt from "bcryptjs";
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60; // Tăng thời gian xử lý (giây)
 
-// 1. Hàm GET: Lấy danh sách tất cả users
 export async function GET() {
     await dbConnect();
     try {
-        // Sắp xếp mới nhất lên đầu (sort createdAt -1)
-        const users = await User.find({}).sort({ createdAt: -1 });
+        // role: 1 (Tăng dần -> admin đứng trước user)
+        // createdAt: -1 (Giảm dần -> Người mới tạo đứng trên)
+        const users = await User.find({}).sort({ role: 1, createdAt: -1 });
+
         return NextResponse.json({ success: true, data: users });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 }
 
-// 2. Hàm POST: Tạo một user mới
+// --- HÀM TẠO MỚI (POST) ---
 export async function POST(request: Request) {
     await dbConnect();
     try {
@@ -28,6 +28,11 @@ export async function POST(request: Request) {
         const exists = await User.findOne({ email: body.email });
         if (exists) {
             return NextResponse.json({ success: false, message: "Email đã tồn tại" }, { status: 400 });
+        }
+
+        // 👇 2. THÊM ĐOẠN NÀY: Mã hóa mật khẩu trước khi lưu
+        if (body.password) {
+            body.password = await bcrypt.hash(body.password, 10);
         }
 
         const user = await User.create(body);
