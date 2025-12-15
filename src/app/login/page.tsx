@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import toast, {Toaster} from 'react-hot-toast';
-import { FaGoogle, FaFacebook } from 'react-icons/fa';
+import {FaGoogle, FaFacebook, FaEyeSlash, FaEye} from 'react-icons/fa';
 
 export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true); // Toggle giữa Login và Register
@@ -62,103 +62,113 @@ export default function LoginPage() {
         }
     };
 
+
+
     return (
         // Thêm text-black ở đây để ép chữ màu đen cho toàn bộ trang
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 text-black">
-            <Toaster position="top-center" />
+        <div
+            className="min-h-screen w-full flex items-center justify-center bg-cover bg-center bg-no-repeat relative text-black"
+            style={{ backgroundImage: "url('/bg-login.jpg')" }}>
+            {/* 2. LỚP MÀN ĐEN MỜ (Overlay) - Để làm tối ảnh nền đi 40% */}
+            <div className="absolute inset-0 bg-black/40 z-0"></div>
 
-            <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200">
-                <h2 className="text-2xl font-bold text-center mb-2 text-gray-800">
-                    {isLogin ? 'Login to your account' : 'Create an account'}
-                </h2>
-                <p className="text-gray-500 text-center mb-6 text-sm">
-                    {isLogin ? 'Enter your email below to login' : 'Enter details to register'}
-                </p>
+            {/* 3. KHUNG CHỨA NỘI DUNG (Quan trọng: phải có z-10 để nổi lên trên lớp đen) */}
+            <div className="z-10 w-full flex flex-col items-center">
+                <Toaster position="top-center" />
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    {!isLogin && (
+                <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200">
+                    <h2 className="text-2xl font-bold text-center mb-2 text-gray-800">
+                        {isLogin ? 'Vừng ơi, mở cửa ra' : 'Create an account'}
+                    </h2>
+                    <p className="text-gray-500 text-center mb-6 text-sm">
+                        {isLogin ? 'Hãy nhập thông tin để cánh cửa mở ra' : 'Enter details to register'}
+                    </p>
+
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                        {!isLogin && (
+                            <div>
+                                <label className="block text-sm font-semibold mb-1 text-gray-700">Full Name</label>
+                                <input
+                                    type="text"
+                                    className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
+                                    placeholder="Ex: John Doe"
+                                    onChange={e => setData({...data, name: e.target.value})}
+                                    required
+                                />
+                            </div>
+                        )}
                         <div>
-                            <label className="block text-sm font-semibold mb-1 text-gray-700">Full Name</label>
+                            <label className="block text-sm font-semibold mb-1 text-gray-700">Email</label>
                             <input
-                                type="text"
+                                type="email"
                                 className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
-                                placeholder="Ex: John Doe"
-                                onChange={e => setData({...data, name: e.target.value})}
+                                placeholder="Nhập email của bạn ở đây nè..."
+                                onChange={e => setData({...data, email: e.target.value})}
                                 required
                             />
                         </div>
-                    )}
-                    <div>
-                        <label className="block text-sm font-semibold mb-1 text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
-                            placeholder="Email..."
-                            onChange={e => setData({...data, email: e.target.value})}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-semibold mb-1 text-gray-700">Password</label>
-                        <input
-                            type="password"
-                            className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
-                            placeholder="••••••••"
-                            onChange={e => setData({...data, password: e.target.value})}
-                            required
-                        />
+                        <div>
+                            <label className="block text-sm font-semibold mb-1 text-gray-700">Password</label>
+                            <input
+                                type="password"
+                                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-black text-black bg-white"
+                                placeholder="••••••••"
+                                onChange={e => setData({...data, password: e.target.value})}
+                                required
+                            />
+
+                        </div>
+
+                        <button type="submit" className="bg-green-600 text-white py-2 rounded-lg font-bold hover:opacity-80 transition mt-2">
+                            {isLogin ? 'Ấn nút này nè' : 'Sign Up'}
+                        </button>
+                    </form>
+
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300"></div></div>
+                        <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-blue-500">HOẶC</span></div>
                     </div>
 
-                    <button type="submit" className="bg-green-600 text-white py-2 rounded-lg font-bold hover:opacity-80 transition mt-2">
-                        {isLogin ? 'Login' : 'Sign Up'}
-                    </button>
-                </form>
+                    <div className="flex gap-4">
+                        <button className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50 text-neutral-600 font-medium bg-white transition-colors">
+                            <FaGoogle className="text-rose-700 text-lg" /> Google
+                        </button>
+                        <button className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50 text-blue-600 font-medium bg-white">
+                            <FaFacebook /> Facebook
+                        </button>
+                    </div>
 
-                <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-300"></div></div>
-                    <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-blue-500">OR CONTINUE WITH</span></div>
+                    <p className="text-center mt-6 text-sm text-gray-600">
+                        {isLogin ? "Bạn chưa có tài khoản ư? " : "Already have an account? "}
+                        <button onClick={() => setIsLogin(!isLogin)} className="underline font-bold text-black hover:text-gray-700">
+                            {isLogin ? 'Vậy thì đăng ký ở đây nè' : 'Login'}
+                        </button>
+                    </p>
                 </div>
 
-                <div className="flex gap-4">
-                    <button className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50 text-neutral-600 font-medium bg-white transition-colors">
-                        <FaGoogle className="text-rose-700 text-lg" /> Google
-                    </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50 text-blue-600 font-medium bg-white">
-                        <FaFacebook /> Facebook
-                    </button>
-                </div>
+                {/* --- HIỆU ỨNG THANH TRƯỢT ĐỎ --- */}
+                {loading && (
+                    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md transition-all duration-300">
 
-                <p className="text-center mt-6 text-sm text-gray-600">
-                    {isLogin ? "Don't have an account? " : "Already have an account? "}
-                    <button onClick={() => setIsLogin(!isLogin)} className="underline font-bold text-black hover:text-gray-700">
-                        {isLogin ? 'Sign up' : 'Login'}
-                    </button>
-                </p>
-            </div>
+                        {/* Hộp chứa thanh trượt */}
+                        <div className="w-64 h-3 bg-gray-800/50 rounded-full relative overflow-hidden p-0.5 backdrop-blur-sm border border-white/10 shadow-xl">
 
-            {/* --- HIỆU ỨNG THANH TRƯỢT ĐỎ --- */}
-            {loading && (
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md transition-all duration-300">
+                            {/* Thanh đỏ trượt bên trong */}
+                            <div className="absolute top-0 left-0 h-full w-1/3 rounded-full bg-gradient-to-r from-red-600 via-red-500 to-red-600 animate-progress-slide shadow-[0_0_20px_rgba(220,38,38,0.8)]">
+                                {/* Hiệu ứng phát sáng ở đầu thanh */}
+                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-red-400 rounded-full blur-[6px]"></div>
+                            </div>
 
-                    {/* Hộp chứa thanh trượt */}
-                    <div className="w-64 h-3 bg-gray-800/50 rounded-full relative overflow-hidden p-0.5 backdrop-blur-sm border border-white/10 shadow-xl">
+                        </div>
 
-                        {/* Thanh đỏ trượt bên trong */}
-                        <div className="absolute top-0 left-0 h-full w-1/3 rounded-full bg-gradient-to-r from-red-600 via-red-500 to-red-600 animate-progress-slide shadow-[0_0_20px_rgba(220,38,38,0.8)]">
-                            {/* Hiệu ứng phát sáng ở đầu thanh */}
-                            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-red-400 rounded-full blur-[6px]"></div>
+                        {/* Dòng chữ Loading bên dưới */}
+                        <div className="mt-6 text-red-500 font-bold tracking-[0.2em] text-sm animate-pulse uppercase">
+                            Đang xử lý...
                         </div>
 
                     </div>
-
-                    {/* Dòng chữ Loading bên dưới */}
-                    <div className="mt-6 text-red-500 font-bold tracking-[0.2em] text-sm animate-pulse uppercase">
-                        Đang xử lý...
-                    </div>
-
-                </div>
-            )}
-
+                )}
+            </div>
         </div>
     );
 }
